@@ -1,286 +1,124 @@
-import { configureStore, createSlice, PayloadAction } from '@reduxjs/toolkit';
+import { configureStore, createSlice } from '@reduxjs/toolkit';
 import { persistStore, persistReducer, FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from 'redux-persist';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { combineReducers } from 'redux';
 
-// ============================================================
-// AUTH SLICE
-// ============================================================
-interface AuthState {
-  user: any | null;
-  accessToken: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean;
-  error: string | null;
-}
-
 const authSlice = createSlice({
   name: 'auth',
-  initialState: {
-    user: null,
-    accessToken: null,
-    isAuthenticated: false,
-    isLoading: false,
-    error: null,
-  } as AuthState,
+  initialState: { user: null as any, accessToken: null as string | null, isAuthenticated: false, isLoading: false, error: null as string | null },
   reducers: {
-    setCredentials: (state, action: PayloadAction<{ user: any; accessToken: string }>) => {
-      state.user = action.payload.user;
-      state.accessToken = action.payload.accessToken;
-      state.isAuthenticated = true;
-      state.error = null;
-    },
-    updateUser: (state, action: PayloadAction<any>) => {
-      state.user = { ...state.user, ...action.payload };
-    },
-    setToken: (state, action: PayloadAction<string>) => {
-      state.accessToken = action.payload;
-    },
-    setTheme: (state, action: PayloadAction<string>) => {
-      if (state.user) state.user.theme = action.payload;
-    },
-    logout: (state) => {
-      state.user = null;
-      state.accessToken = null;
-      state.isAuthenticated = false;
-      state.error = null;
-    },
-    setLoading: (state, action: PayloadAction<boolean>) => { state.isLoading = action.payload; },
-    setError: (state, action: PayloadAction<string | null>) => { state.error = action.payload; },
+    setCredentials: (s, a) => { s.user = a.payload.user; s.accessToken = a.payload.accessToken; s.isAuthenticated = true; s.error = null; },
+    updateUser: (s, a) => { s.user = { ...s.user, ...a.payload }; },
+    setToken: (s, a) => { s.accessToken = a.payload; },
+    setTheme: (s, a) => { if (s.user) s.user.theme = a.payload; },
+    logout: (s) => { s.user = null; s.accessToken = null; s.isAuthenticated = false; },
+    setLoading: (s, a) => { s.isLoading = a.payload; },
+    setError: (s, a) => { s.error = a.payload; },
   },
 });
-
-// ============================================================
-// PARKING SLICE
-// ============================================================
-interface ParkingState {
-  yards: any[];
-  selectedYard: any | null;
-  myBookings: any[];
-  activeBooking: any | null;
-  priceCalculation: any | null;
-  filters: {
-    emirate: string;
-    maxPrice: number | null;
-    minSpots: number;
-    sortBy: string;
-  };
-  isLoading: boolean;
-  error: string | null;
-}
 
 const parkingSlice = createSlice({
   name: 'parking',
-  initialState: {
-    yards: [],
-    selectedYard: null,
-    myBookings: [],
-    activeBooking: null,
-    priceCalculation: null,
-    filters: { emirate: '', maxPrice: null, minSpots: 1, sortBy: '-rating' },
-    isLoading: false,
-    error: null,
-  } as ParkingState,
+  initialState: { yards: [] as any[], selectedYard: null as any, myBookings: [] as any[], activeBooking: null as any, priceCalculation: null as any, filters: { emirate: '', maxPrice: null as any, minSpots: 1, sortBy: '-rating' }, isLoading: false, error: null as any },
   reducers: {
-    setYards: (state, action: PayloadAction<any[]>) => { state.yards = action.payload; },
-    setSelectedYard: (state, action: PayloadAction<any>) => { state.selectedYard = action.payload; },
-    setMyBookings: (state, action: PayloadAction<any[]>) => { state.myBookings = action.payload; },
-    setActiveBooking: (state, action: PayloadAction<any>) => { state.activeBooking = action.payload; },
-    setPriceCalculation: (state, action: PayloadAction<any>) => { state.priceCalculation = action.payload; },
-    setFilters: (state, action: PayloadAction<Partial<ParkingState['filters']>>) => {
-      state.filters = { ...state.filters, ...action.payload };
-    },
-    setParkingLoading: (state, action: PayloadAction<boolean>) => { state.isLoading = action.payload; },
-    setParkingError: (state, action: PayloadAction<string | null>) => { state.error = action.payload; },
-    cancelBookingLocal: (state, action: PayloadAction<string>) => {
-      state.myBookings = state.myBookings.map(b => b._id === action.payload ? { ...b, status: 'cancelled' } : b);
-    },
+    setYards: (s, a) => { s.yards = a.payload; },
+    setSelectedYard: (s, a) => { s.selectedYard = a.payload; },
+    setMyBookings: (s, a) => { s.myBookings = a.payload; },
+    setActiveBooking: (s, a) => { s.activeBooking = a.payload; },
+    setPriceCalculation: (s, a) => { s.priceCalculation = a.payload; },
+    setFilters: (s, a) => { s.filters = { ...s.filters, ...a.payload }; },
+    setParkingLoading: (s, a) => { s.isLoading = a.payload; },
+    setParkingError: (s, a) => { s.error = a.payload; },
+    cancelBookingLocal: (s, a) => { s.myBookings = s.myBookings.map((b: any) => b._id === a.payload ? { ...b, status: 'cancelled' } : b); },
   },
 });
 
-// ============================================================
-// BOATS SLICE
-// ============================================================
 const boatsSlice = createSlice({
   name: 'boats',
   initialState: { boats: [] as any[], selectedBoat: null as any, isLoading: false },
   reducers: {
-    setBoats: (state, action) => { state.boats = action.payload; },
-    addBoat: (state, action) => { state.boats.unshift(action.payload); },
-    updateBoat: (state, action) => {
-      const idx = state.boats.findIndex(b => b._id === action.payload._id);
-      if (idx !== -1) state.boats[idx] = action.payload;
-    },
-    removeBoat: (state, action) => { state.boats = state.boats.filter(b => b._id !== action.payload); },
-    setSelectedBoat: (state, action) => { state.selectedBoat = action.payload; },
-    setBoatsLoading: (state, action) => { state.isLoading = action.payload; },
+    setBoats: (s, a) => { s.boats = a.payload; },
+    addBoat: (s, a) => { s.boats.unshift(a.payload); },
+    updateBoat: (s, a) => { const i = s.boats.findIndex((b: any) => b._id === a.payload._id); if (i !== -1) s.boats[i] = a.payload; },
+    removeBoat: (s, a) => { s.boats = s.boats.filter((b: any) => b._id !== a.payload); },
+    setSelectedBoat: (s, a) => { s.selectedBoat = a.payload; },
+    setBoatsLoading: (s, a) => { s.isLoading = a.payload; },
   },
 });
 
-// ============================================================
-// CHARTER SLICE
-// ============================================================
 const charterSlice = createSlice({
   name: 'charter',
-  initialState: {
-    captains: [] as any[],
-    packages: [] as any[],
-    myBookings: [] as any[],
-    activeCharter: null as any,
-    liveLocation: null as any,
-    isLoading: false,
-  },
+  initialState: { captains: [] as any[], packages: [] as any[], myBookings: [] as any[], activeCharter: null as any, liveLocation: null as any, isLoading: false },
   reducers: {
-    setCaptains: (state, action) => { state.captains = action.payload; },
-    setPackages: (state, action) => { state.packages = action.payload; },
-    setCharterBookings: (state, action) => { state.myBookings = action.payload; },
-    setActiveCharter: (state, action) => { state.activeCharter = action.payload; },
-    updateCharterLocation: (state, action) => { state.liveLocation = action.payload; },
-    setCharterLoading: (state, action) => { state.isLoading = action.payload; },
+    setCaptains: (s, a) => { s.captains = a.payload; },
+    setPackages: (s, a) => { s.packages = a.payload; },
+    setCharterBookings: (s, a) => { s.myBookings = a.payload; },
+    setActiveCharter: (s, a) => { s.activeCharter = a.payload; },
+    updateCharterLocation: (s, a) => { s.liveLocation = a.payload; },
+    setCharterLoading: (s, a) => { s.isLoading = a.payload; },
   },
 });
 
-// ============================================================
-// MARKETPLACE SLICE
-// ============================================================
 const marketplaceSlice = createSlice({
   name: 'marketplace',
-  initialState: {
-    products: [] as any[],
-    categories: [] as any[],
-    cart: [] as Array<{ product: any; quantity: number; variant?: string }>,
-    orders: [] as any[],
-    searchQuery: '',
-    selectedCategory: '',
-    isLoading: false,
-  },
+  initialState: { products: [] as any[], categories: [] as any[], cart: [] as any[], orders: [] as any[], searchQuery: '', selectedCategory: '', isLoading: false },
   reducers: {
-    setProducts: (state, action) => { state.products = action.payload; },
-    setCategories: (state, action) => { state.categories = action.payload; },
-    addToCart: (state, action) => {
-      // HashMap O(1) lookup by product ID
-      const existing = state.cart.find(item => item.product._id === action.payload.product._id && item.variant === action.payload.variant);
-      if (existing) existing.quantity += action.payload.quantity || 1;
-      else state.cart.push({ ...action.payload, quantity: action.payload.quantity || 1 });
-    },
-    removeFromCart: (state, action) => {
-      state.cart = state.cart.filter(item => item.product._id !== action.payload);
-    },
-    updateCartQuantity: (state, action) => {
-      const item = state.cart.find(i => i.product._id === action.payload.productId);
-      if (item) item.quantity = action.payload.quantity;
-    },
-    clearCart: (state) => { state.cart = []; },
-    setOrders: (state, action) => { state.orders = action.payload; },
-    setSearchQuery: (state, action) => { state.searchQuery = action.payload; },
-    setSelectedCategory: (state, action) => { state.selectedCategory = action.payload; },
-    setMarketplaceLoading: (state, action) => { state.isLoading = action.payload; },
+    setProducts: (s, a) => { s.products = a.payload; },
+    setCategories: (s, a) => { s.categories = a.payload; },
+    addToCart: (s, a) => { const ex = s.cart.find((i: any) => i.product._id === a.payload.product._id); if (ex) (ex as any).quantity += 1; else s.cart.push({ ...a.payload, quantity: 1 }); },
+    removeFromCart: (s, a) => { s.cart = s.cart.filter((i: any) => i.product._id !== a.payload); },
+    updateCartQuantity: (s, a) => { const item = s.cart.find((i: any) => i.product._id === a.payload.productId); if (item) (item as any).quantity = a.payload.quantity; },
+    clearCart: (s) => { s.cart = []; },
+    setOrders: (s, a) => { s.orders = a.payload; },
+    setSearchQuery: (s, a) => { s.searchQuery = a.payload; },
+    setSelectedCategory: (s, a) => { s.selectedCategory = a.payload; },
+    setMarketplaceLoading: (s, a) => { s.isLoading = a.payload; },
   },
 });
 
-// ============================================================
-// DELIVERY SLICE
-// ============================================================
 const deliverySlice = createSlice({
   name: 'delivery',
-  initialState: {
-    deliveries: [] as any[],
-    activeDelivery: null as any,
-    driverLocation: null as { lat: number; lng: number } | null,
-    marinas: [] as any[],
-    isLoading: false,
-  },
+  initialState: { deliveries: [] as any[], activeDelivery: null as any, driverLocation: null as any, marinas: [] as any[], isLoading: false },
   reducers: {
-    setDeliveries: (state, action) => { state.deliveries = action.payload; },
-    setActiveDelivery: (state, action) => { state.activeDelivery = action.payload; },
-    updateDriverLocation: (state, action) => { state.driverLocation = action.payload; },
-    setMarinas: (state, action) => { state.marinas = action.payload; },
-    updateDeliveryStatus: (state, action) => {
-      if (state.activeDelivery?._id === action.payload.deliveryId) {
-        state.activeDelivery.status = action.payload.status;
-      }
-    },
-    setDeliveryLoading: (state, action) => { state.isLoading = action.payload; },
+    setDeliveries: (s, a) => { s.deliveries = a.payload; },
+    setActiveDelivery: (s, a) => { s.activeDelivery = a.payload; },
+    updateDriverLocation: (s, a) => { s.driverLocation = a.payload; },
+    setMarinas: (s, a) => { s.marinas = a.payload; },
+    updateDeliveryStatus: (s, a) => { if ((s.activeDelivery as any)?._id === a.payload.deliveryId) (s.activeDelivery as any).status = a.payload.status; },
+    setDeliveryLoading: (s, a) => { s.isLoading = a.payload; },
   },
 });
 
-// ============================================================
-// NOTIFICATIONS SLICE
-// ============================================================
 const notificationsSlice = createSlice({
   name: 'notifications',
-  initialState: {
-    notifications: [] as any[],
-    unreadCount: 0,
-  },
+  initialState: { notifications: [] as any[], unreadCount: 0 },
   reducers: {
-    setNotifications: (state, action) => { state.notifications = action.payload; },
-    prependNotification: (state, action) => {
-      state.notifications.unshift(action.payload);
-      state.unreadCount += 1;
-    },
-    setUnreadCount: (state, action) => { state.unreadCount = action.payload; },
-    markAllRead: (state) => {
-      state.notifications = state.notifications.map(n => ({ ...n, isRead: true }));
-      state.unreadCount = 0;
-    },
+    setNotifications: (s, a) => { s.notifications = a.payload; },
+    prependNotification: (s, a) => { s.notifications.unshift(a.payload); s.unreadCount += 1; },
+    setUnreadCount: (s, a) => { s.unreadCount = a.payload; },
+    markAllRead: (s) => { s.notifications = s.notifications.map(n => ({ ...n, isRead: true })); s.unreadCount = 0; },
   },
 });
 
-// ============================================================
-// UI SLICE
-// ============================================================
 const uiSlice = createSlice({
   name: 'ui',
-  initialState: {
-    theme: 'deep_ocean' as string,
-    isFirstLaunch: true,
-    weatherData: null as any,
-    tidesData: null as any[],
-  },
+  initialState: { theme: 'deep_ocean', isFirstLaunch: true, weatherData: null as any, tidesData: null as any },
   reducers: {
-    setTheme: (state, action) => { state.theme = action.payload; },
-    setFirstLaunch: (state, action) => { state.isFirstLaunch = action.payload; },
-    setWeatherData: (state, action) => { state.weatherData = action.payload; },
-    setTidesData: (state, action) => { state.tidesData = action.payload; },
+    setTheme: (s, a) => { s.theme = a.payload; },
+    setFirstLaunch: (s, a) => { s.isFirstLaunch = a.payload; },
+    setWeatherData: (s, a) => { s.weatherData = a.payload; },
+    setTidesData: (s, a) => { s.tidesData = a.payload; },
   },
 });
 
-// ============================================================
-// COMBINE & PERSIST
-// ============================================================
-const rootReducer = combineReducers({
-  auth: authSlice.reducer,
-  parking: parkingSlice.reducer,
-  boats: boatsSlice.reducer,
-  charter: charterSlice.reducer,
-  marketplace: marketplaceSlice.reducer,
-  delivery: deliverySlice.reducer,
-  notifications: notificationsSlice.reducer,
-  ui: uiSlice.reducer,
-});
-
-const persistConfig = {
-  key: 'root',
-  storage: AsyncStorage,
-  whitelist: ['auth', 'ui'], // Only persist auth & theme
-};
-
-const persistedReducer = persistReducer(persistConfig, rootReducer);
+const rootReducer = combineReducers({ auth: authSlice.reducer, parking: parkingSlice.reducer, boats: boatsSlice.reducer, charter: charterSlice.reducer, marketplace: marketplaceSlice.reducer, delivery: deliverySlice.reducer, notifications: notificationsSlice.reducer, ui: uiSlice.reducer });
+const persistConfig = { key: 'root', storage: AsyncStorage, whitelist: ['auth', 'ui'] };
 
 export const store = configureStore({
-  reducer: persistedReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      serializableCheck: {
-        ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-      },
-    }),
+  reducer: persistReducer(persistConfig, rootReducer),
+  middleware: (g) => g({ serializableCheck: { ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER] } }),
 });
-
 export const persistor = persistStore(store);
-
-// Export actions
 export const authActions = authSlice.actions;
 export const parkingActions = parkingSlice.actions;
 export const boatsActions = boatsSlice.actions;
@@ -289,7 +127,7 @@ export const marketplaceActions = marketplaceSlice.actions;
 export const deliveryActions = deliverySlice.actions;
 export const notificationsActions = notificationsSlice.actions;
 export const uiActions = uiSlice.actions;
-
-// Types
+// keep appActions stub so existing imports don't break
+export const appActions = { setMode: () => ({}), clearMode: () => ({}) } as any;
 export type RootState = ReturnType<typeof store.getState>;
 export type AppDispatch = typeof store.dispatch;
