@@ -1,0 +1,52 @@
+{
+  "expo": {
+    "name": "Park & Launch",
+    "slug": "park-and-launch",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#020B18"
+    },
+    "assetBundlePatterns": ["**/*"],
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "ae.parkandlaunch.app",
+      "buildNumber": "1",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Park & Launch uses your location to find nearby parking yards.",
+        "NSCameraUsageDescription": "Park & Launch uses the camera to capture boat condition photos.",
+        "NSPhotoLibraryUsageDescription": "Park & Launch accesses your photo library to upload boat photos."
+      }
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#020B18"
+      },
+      "package": "ae.parkandlaunch.app",
+      "versionCode": 1,
+      "permissions": [
+        "ACCESS_COARSE_LOCATION",
+        "ACCESS_FINE_LOCATION",
+        "CAMERA",
+        "INTERNET",
+        "VIBRATE"
+      ]
+    },
+    "plugins": [
+      "expo-font",
+      "expo-secure-store",
+      [
+        "expo-location",
+        { "locationAlwaysAndWhenInUsePermission": "Allow Park & Launch to use your location." }
+      ]
+    ],
+    "extra": {
+      "eas": { "projectId": "your-eas-project-id" }
+    }
+  }
+}
