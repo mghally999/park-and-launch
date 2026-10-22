@@ -125,7 +125,7 @@ const seed = async () => {
       name: 'Ahmed Al Rashidi',
       email: 'ahmed@parkandlaunch.ae',
       phone: '+97150111222',
-      password: 'user123',
+      password: 'user1234',
       role: 'user',
       isEmailVerified: true,
       isPhoneVerified: true,
@@ -175,7 +175,7 @@ const seed = async () => {
     console.log('  Pass:    admin123');
     console.log('───────────────────────────────────────');
     console.log('  User:    ahmed@parkandlaunch.ae');
-    console.log('  Pass:    user123');
+    console.log('  Pass:    user1234');
     console.log('───────────────────────────────────────');
     console.log('  Captain: captain@parkandlaunch.ae');
     console.log('  Pass:    captain123');

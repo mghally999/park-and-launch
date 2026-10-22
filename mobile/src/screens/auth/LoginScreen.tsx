@@ -101,7 +101,7 @@ export const LoginScreen = () => {
         {/* Hint box */}
         <View style={{ marginTop: SPACING.xl, padding: SPACING.md, borderRadius: RADIUS.md, borderWidth: 1, borderColor: C.border, backgroundColor: 'rgba(201,168,76,0.05)' }}>
           <Text style={{ fontFamily: FONTS.body.bold, color: C.primary, fontSize: TYPE_SCALE.xs, marginBottom: 6 }}>TEST CREDENTIALS</Text>
-          <Text style={{ fontFamily: FONTS.body.regular, color: C.textSec, fontSize: TYPE_SCALE.xs }}>User:    ahmed@parkandlaunch.ae / user123</Text>
+          <Text style={{ fontFamily: FONTS.body.regular, color: C.textSec, fontSize: TYPE_SCALE.xs }}>User:    ahmed@parkandlaunch.ae / user1234</Text>
           <Text style={{ fontFamily: FONTS.body.regular, color: C.textSec, fontSize: TYPE_SCALE.xs }}>Admin:   admin@parkandlaunch.ae / admin123</Text>
           <Text style={{ fontFamily: FONTS.body.regular, color: C.textSec, fontSize: TYPE_SCALE.xs }}>Captain: captain@parkandlaunch.ae / captain123</Text>
         </View>
