@@ -127,7 +127,7 @@ export default function ParkingListScreen() {
         </View>
       </View>
 
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.filterRow}>
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ flexGrow: 0, flexShrink: 0 }} contentContainerStyle={s.filterRow}>
         {['All', ...emirates].map(e => {
           const active = (e === 'All' && !emirate) || e === emirate;
           return (
